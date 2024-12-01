@@ -1,0 +1,30 @@
+# Environment variables
+.env
+*.env
+
+# Virtual environments
+venv/
+
+# Python bytecode
+*.pyc
+*.pyo
+__pycache__/
+
+# SQLite database
+*.sqlite3
+
+# Logs
+*.log
+
+# Static and media files
+staticfiles/
+media/
+
+# IDE configurations
+.vscode/
+.idea/
+
+# Dependencies
+*.egg-info/
+dist/
+build/
