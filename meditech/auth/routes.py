@@ -1,4 +1,5 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
+from flask_login import login_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from meditech.users.models import User
 from meditech.app import db
@@ -7,7 +8,7 @@ from datetime import datetime
 auth = Blueprint('auth', __name__, url_prefix='/auth')
 
 @auth.route('/register', methods=['POST'])
-def register_user():
+def register():
     """
     Endpoint to register a new user.
     Expects a JSON payload with:
@@ -62,7 +63,7 @@ def register_user():
         return jsonify({'error': 'Failed to register user.', 'details': str(e)}), 500
 
 @auth.route('/login', methods=['POST'])
-def login_user():
+def login():
     """
     Endpoint to authenticate a user.
     Expects a JSON payload with:
@@ -91,9 +92,7 @@ def login_user():
         return jsonify({'error': 'Invalid email or password.'}), 401
 
     # Store user session details
-    # TODO: Create session for privacy
-    # session['user_id'] = str(user.id)
-    # session['email'] = user.email
+    login_user(user)
 
     return jsonify({
         'message': 'Login successful',

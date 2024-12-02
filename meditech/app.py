@@ -1,22 +1,44 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_session import Session  # Flask-Session for session management
+from flask_login import LoginManager  # Flask-Login for user authentication
 
+# Initialize the database instance
 db = SQLAlchemy()
+
+# Initialize the login manager
+login_manager = LoginManager()
 
 def create_app():
     app = Flask(__name__)
+
+    # Configure the app (consider moving sensitive keys to environment variables)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:vamos-a-china2025!@localhost:5432/postgres'
+    app.config['SECRET_KEY'] = 'meditech-secret'  # Set a secure key for signing cookies and sessions
 
+    # Flask-Session Configuration
+    app.config['SESSION_TYPE'] = 'filesystem'  # Or 'redis' for production
+    app.config['SESSION_PERMANENT'] = False
+    app.config['SESSION_USE_SIGNER'] = True  # Sign session cookies to prevent tampering
+
+    # Initialize Flask extensions
     db.init_app(app)
+    migrate = Migrate(app, db)
+    Session(app)  # Flask-Session for server-side sessions
+    login_manager.init_app(app)  # Flask-Login for managing user sessions
 
-    # Import and register all blueprints
-
+    # Register Blueprints
     from .appointments.routes import appointments
     from .auth.routes import auth
 
     app.register_blueprint(appointments, url_prefix='/appointments')
     app.register_blueprint(auth, url_prefix='/auth')
-    migrate = Migrate(app, db)
+
+    # Setup login manager (user loader function)
+    @login_manager.user_loader
+    def load_user(user_id):
+        from .users.models import User
+        return User.query.get(user_id)
 
     return app
