@@ -10,6 +10,8 @@ class Doctor(db.Model):
     name = db.Column(db.String, nullable=False)
     hospital = db.Column(db.String, nullable=False)
     phone = db.Column(db.String, nullable=False)
-    
+
+    appointments = db.relationship('Appointment', back_populates='doctor', cascade='all, delete-orphan')
+
     def __repr__(self):
         return f"<Appointment {self.id}, User {self.user_id}>"
