@@ -31,9 +31,11 @@ def create_app():
     # Register Blueprints
     from .appointments.routes import appointments
     from .auth.routes import auth
+    from .doctors.routes import doctors
 
     app.register_blueprint(appointments, url_prefix='/appointments')
     app.register_blueprint(auth, url_prefix='/auth')
+    app.register_blueprint(doctors, url_prefix='/doctors')
 
     # Setup login manager (user loader function)
     @login_manager.user_loader
