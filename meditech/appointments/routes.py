@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 
 from meditech.app import db
 from meditech.appointments.models import Appointment
+from meditech.doctors.models import Doctor
 from meditech.users.models import User
 from datetime import datetime
 
@@ -53,34 +54,43 @@ def create_appointment():
     # Check for form data or JSON
     # Use current_user to get the logged-in user
     user_id = current_user.id  # Get logged-in user’s ID
+    # TODO: Update info to match the Appointment model
     if request.content_type == 'application/json':
         data = request.json
-        date_str = data.get('date')
         notes = data.get('notes', '')  # Notes are optional
+        medication = data.get('medication', '')  # Medication is optional
+        heart_rate = data.get('heart_rate', '')  # Heart Rate is optional
+        blood_pressure = data.get('blood_pressure', '')  # Blood Pressure is optional
+        weight = data.get('weight', 0.00)  # Weight is optional
+        doctor_id = data.get('doctor_id')
     else:
-        date_str = request.form.get('date')
         notes = request.form.get('notes', '')
-
-    # Validate the required fields
-    if not date_str or not user_id:
-        return jsonify({'error': 'The date and user_id fields are required'}), 400
-
-    try:
-        # Convert date string to a datetime.date object
-        appointment_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-    except ValueError:
-        return jsonify({'error': 'Invalid date format. Use YYYY-MM-DD'}), 400
+        medication = request.form.get('medication', '')
+        heart_rate = request.form.get('heart_rate', '')
+        blood_pressure = request.form.get('blood_pressure', '')
+        weight = request.form.get('weight', 0.00)
+        doctor_id = request.form.get('doctor_id')
 
     # Retrieve the user from the database
     user = User.query.get(user_id)
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
+    doctor = Doctor.query.get(doctor_id)
+    if not doctor:
+        return jsonify({'error': 'Doctor not found'}), 404
+
+    # TODO: Update the instantiation of new appointment
     # Create a new appointment instance
     new_appointment = Appointment(
-        date=appointment_date,
+        doctor_id=doctor_id,
+        date=datetime.now().isoformat(),
+        user_id=user.id,  # Link appointment to user
         notes=notes,
-        user_id=user.id  # Link appointment to user
+        medication=medication,
+        heart_rate=heart_rate,
+        blood_pressure=blood_pressure,
+        weight=weight
     )
 
     # Add and commit the new appointment to the database
@@ -91,9 +101,13 @@ def create_appointment():
             'message': 'Appointment created successfully',
             'appointment': {
                 'id': str(new_appointment.id),  # UUID is serialized as a string
-                'date': new_appointment.date.isoformat(),
+                'user_id': str(new_appointment.user_id),
+                'doctor_id': str(new_appointment.doctor_id),
                 'notes': new_appointment.notes,
-                'user_id': str(new_appointment.user_id)
+                'medication': new_appointment.medication,
+                'heart_rate': new_appointment.heart_rate,
+                'blood_pressure': new_appointment.blood_pressure,
+                'weight': new_appointment.weight
             }
         }), 201
     except Exception as e:
