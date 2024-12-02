@@ -13,9 +13,10 @@ def create_app():
     # Import and register all blueprints
 
     from .appointments.routes import appointments
+    from .auth.routes import auth
 
     app.register_blueprint(appointments, url_prefix='/appointments')
-
+    app.register_blueprint(auth, url_prefix='/auth')
     migrate = Migrate(app, db)
 
     return app
