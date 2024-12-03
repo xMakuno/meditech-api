@@ -11,3 +11,5 @@ class Hospital(db.Model):
     location = db.Column(db.String, nullable=False)
 
     appointments = db.relationship('Appointment', back_populates='hospital', cascade='all, delete-orphan')
+    examinations = db.relationship('Examination', back_populates='hospital', cascade='all, delete-orphan')
+

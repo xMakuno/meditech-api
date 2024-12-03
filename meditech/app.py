@@ -36,6 +36,7 @@ def create_app():
     from .insurances.routes import insurances
     from .subscriptions.routes import subscriptions
     from .medications.routes import medications
+    from .examinations.routes import examinations
 
     app.register_blueprint(appointments, url_prefix='/appointments')
     app.register_blueprint(auth, url_prefix='/auth')
@@ -44,6 +45,7 @@ def create_app():
     app.register_blueprint(insurances, url_prefix='/insurances')
     app.register_blueprint(subscriptions, url_prefix='/subscriptions')
     app.register_blueprint(medications, url_prefix='/medications')
+    app.register_blueprint(examinations, url_prefix='/examinations')
 
     # Setup login manager (user loader function)
     @login_manager.user_loader

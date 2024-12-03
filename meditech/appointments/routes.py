@@ -1,6 +1,6 @@
 from flask import request, redirect, url_for, Blueprint, jsonify, session
 from flask_login import login_required, current_user
-
+from sqlalchemy import desc
 from meditech.app import db
 from meditech.appointments.models import Appointment
 from meditech.doctors.models import Doctor
@@ -8,6 +8,32 @@ from meditech.users.models import User
 from datetime import datetime
 
 appointments = Blueprint('appointments', __name__ )
+
+
+@appointments.route('/last', methods=['GET'])
+@login_required
+def get_last_check_appointment():
+    user_id = current_user.id
+    last_appointment = Appointment.query.filter(
+        Appointment.user_id == user_id,
+        Appointment.pending == False,
+    ).order_by(desc(Appointment.date)).first()
+
+    if not last_appointment:
+        return jsonify({'error': 'No Appointment found (No appointments are not pending)'}), 404
+
+    return jsonify({
+        'id': str(last_appointment.id),
+        'date': last_appointment.date.isoformat(),
+        'heart_rate': last_appointment.heart_rate,
+        'blood_pressure': last_appointment.blood_pressure,
+        'weight': last_appointment.weight,
+        'recommendations': last_appointment.recommendations,
+        'reason': last_appointment.reason,
+        'user_id': str(last_appointment.user_id),
+        'doctor_id': last_appointment.doctor_id,
+        'pending': last_appointment.pending
+    }), 200
 
 
 @appointments.route('/pending/<appointment_id>', methods=['PATCH'])
@@ -24,6 +50,10 @@ def toggle_pending_appointment(appointment_id):
             'appointment': {
                 'id': str(appointment.id),
                 'date': appointment.date.isoformat(),
+                'heart_rate': appointment.heart_rate,
+                'blood_pressure': appointment.blood_pressure,
+                'weight': appointment.weight,
+                'recommendations': appointment.recommendations,
                 'reason': appointment.reason,
                 'user_id': str(appointment.user_id),
                 'doctor_id': appointment.doctor_id,
@@ -41,6 +71,10 @@ def get_appointments_by_doctor_id(doctor_id):
     return jsonify([{
         'id': str(appointment.id),
         'date': appointment.date.isoformat(),
+        'heart_rate': appointment.heart_rate,
+        'blood_pressure': appointment.blood_pressure,
+        'weight': appointment.weight,
+        'recommendations': appointment.recommendations,
         'reason': appointment.reason,
         'user_id': str(appointment.user_id),
         'doctor_id': appointment.doctor_id,
@@ -57,6 +91,10 @@ def get_pending_appointments_by_doctor_id(doctor_id):
     return jsonify([{
         'id': str(appointment.id),
         'date': appointment.date.isoformat(),
+        'heart_rate': appointment.heart_rate,
+        'blood_pressure': appointment.blood_pressure,
+        'weight': appointment.weight,
+        'recommendations': appointment.recommendations,
         'reason': appointment.reason,
         'user_id': str(appointment.user_id),
         'doctor_id': appointment.doctor_id,
@@ -72,9 +110,13 @@ def get_self_appointments():
     return jsonify([{
         'id': str(appointment.id),
         'date': appointment.date.isoformat(),
+        'heart_rate': appointment.heart_rate,
+        'blood_pressure': appointment.blood_pressure,
+        'weight': appointment.weight,
+        'recommendations': appointment.recommendations,
         'reason': appointment.reason,
         'user_id': str(appointment.user_id),
-        'doctor_id':  appointment.doctor_id,
+        'doctor_id': appointment.doctor_id,
         'pending': appointment.pending
     } for appointment in appointments_list]), 200
 
@@ -86,6 +128,10 @@ def get_all():
     return jsonify([{
         'id': str(appointment.id),
         'date': appointment.date.isoformat(),
+        'heart_rate': appointment.heart_rate,
+        'blood_pressure': appointment.blood_pressure,
+        'weight': appointment.weight,
+        'recommendations': appointment.recommendations,
         'reason': appointment.reason,
         'user_id': str(appointment.user_id),
         'doctor_id': appointment.doctor_id,
@@ -118,9 +164,20 @@ def create_appointment():
         data = request.json
         reason = data.get('reason')
         doctor_id = data.get('doctor_id')
+        hospital_id = data.get('hospital_id', '')
+        heart_rate = data.get('heart_rate', '')
+        blood_pressure = data.get('blood_pressure', '')
+        weight = float(data.get('weight', 0.00))
+        recommendations = data.get('recommendations',  '')
     else:
         reason = request.form.get('reason')
         doctor_id = request.form.get('doctor_id')
+        hospital_id = request.form.get('hospital_id', '')
+        heart_rate = request.form.get('heart_rate', '')
+        blood_pressure = request.form.get('blood_pressure', '')
+        weight = float(request.form.get('weight', 0.00))
+        recommendations = request.form.get('recommendations',  '')
+
 
     # Retrieve the user from the database
     user = User.query.get(user_id)
@@ -137,7 +194,11 @@ def create_appointment():
         doctor_id=doctor.id,
         date=datetime.now().isoformat(),
         user_id=user.id,  # Link appointment to user
-        reason=reason
+        reason=reason,
+        heart_rate=heart_rate,
+        blood_pressure=blood_pressure,
+        weight=weight,
+        recommendations=recommendations
     )
 
     # Add and commit the new appointment to the database
@@ -152,6 +213,11 @@ def create_appointment():
                 'doctor_id': str(new_appointment.doctor_id),
                 'reason': new_appointment.reason,
                 'date': new_appointment.date.isoformat(),
+                'heart_rate': new_appointment.heart_rate,
+                'blood_pressure': new_appointment.blood_pressure,
+                'weight': new_appointment.weight,
+                'recommendations': new_appointment.recommendations,
+                'pending': new_appointment.pending
             }
         }), 201
     except Exception as e:

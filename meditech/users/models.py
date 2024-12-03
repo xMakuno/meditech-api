@@ -16,6 +16,7 @@ class User(db.Model, UserMixin):
     # Relationships
     appointments = db.relationship('Appointment', back_populates='user', cascade='all, delete-orphan')
     subscriptions = db.relationship('Subscription', back_populates='user', cascade='all, delete-orphan')
+    examinations = db.relationship('Examination', back_populates='user', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"<User {self.name}>"

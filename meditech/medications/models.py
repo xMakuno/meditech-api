@@ -11,5 +11,6 @@ class Medication(db.Model):
     active = db.Column(db.Boolean, nullable=False, default=True)
     schedule = db.Column(db.String, nullable=False)
     appointment_id = db.Column(UUID(as_uuid=True), db.ForeignKey('appointments.id'), nullable=False)  # FK
+    user_id = db.Column(db.String, nullable=True)  # FK
 
     appointment = db.relationship('Appointment', back_populates='medications')

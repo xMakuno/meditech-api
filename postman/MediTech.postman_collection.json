@@ -1,0 +1,566 @@
+{
+	"info": {
+		"_postman_id": "2093e55b-37f2-4762-a620-7b059f2916ce",
+		"name": "MediTech",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32700911",
+		"_collection_link": "https://rankcodecompany.postman.co/workspace/RankCode-Workspace~e553a4bf-b9bb-4fa7-8b35-dc7e0daef282/collection/32700911-2093e55b-37f2-4762-a620-7b059f2916ce?action=share&source=collection_link&creator=32700911"
+	},
+	"item": [
+		{
+			"name": "Appointments",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/appointments",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"appointments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "date",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "doctor_id",
+									"value": "557cf3c5-ac1c-4f34-b763-8f4cd3c914fc",
+									"type": "text"
+								},
+								{
+									"key": "reason",
+									"value": "Mild Migraine",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/appointments",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"appointments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Self Appointments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/appointments/self",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"appointments",
+								"self"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Pending",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/appointments/pending/fa990c7a-3ae0-4bc5-b8e0-ba884c211878",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"appointments",
+								"pending",
+								"fa990c7a-3ae0-4bc5-b8e0-ba884c211878"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Appointments by Doctor ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/appointments/pending/ca58b073-6b0a-4f09-aea3-139b9f5ff309",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"appointments",
+								"pending",
+								"ca58b073-6b0a-4f09-aea3-139b9f5ff309"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Last",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/appointments/last",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"appointments",
+								"last"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"mamv2002@gmail.com\",\n  \"password\": \"hola123\",\n  \"birthdate\": \"2001-03-23\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\":\"securepassword123\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Mario",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"mamv2001@gmail.com\",\n    \"password\":\"hola123\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Doctors",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "Dr. David Diaz",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "david.diaz@meditech.org",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "22577777",
+									"type": "text"
+								},
+								{
+									"key": "hospital",
+									"value": "Hospital de Zacamil",
+									"type": "text"
+								},
+								{
+									"key": "specialty",
+									"value": "Pediatrics",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/doctors",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"doctors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/doctors/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"doctors",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Doctor by Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/doctors/557cf3c5-ac1c-4f34-b763-8f4cd3c914fc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"doctors",
+								"557cf3c5-ac1c-4f34-b763-8f4cd3c914fc"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Insurances",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/insurances/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"insurances",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Subscriptions",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/subscriptions/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"subscriptions",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Self Subscriptions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/subscriptions/self",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"subscriptions",
+								"self"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Medication",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/medications",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"medications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "Loratadine",
+									"type": "text"
+								},
+								{
+									"key": "schedule",
+									"value": "Morning",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/medications/fa990c7a-3ae0-4bc5-b8e0-ba884c211878",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"medications",
+								"fa990c7a-3ae0-4bc5-b8e0-ba884c211878"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Active",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/medications/e16b645a-b8d6-4ac9-ad51-8337eca231ad",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"medications",
+								"e16b645a-b8d6-4ac9-ad51-8337eca231ad"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Self Active Medication",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/medications/self",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"medications",
+								"self"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Examination",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/examinations/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"examinations",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/examinations/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"examinations",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Hospitals",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/hospitals/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hospitals",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Hospital by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/hospitals/5949b7ae-4910-4b54-8c6d-f54548f85b03",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hospitals",
+								"5949b7ae-4910-4b54-8c6d-f54548f85b03"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
