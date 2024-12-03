@@ -12,7 +12,8 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.Text, nullable=False)
     birthdate = db.Column(db.Date, nullable=False)
-
+    upload_path = db.Colum(db.String(100), nullable=False)
+    
     # Relationships
     appointments = db.relationship('Appointment', back_populates='user', cascade='all, delete-orphan')
     subscriptions = db.relationship('Subscription', back_populates='user', cascade='all, delete-orphan')

@@ -23,6 +23,7 @@ def register():
     email = data.get('email')
     password = data.get('password')
     birthdate_str = data.get('birthdate')
+    upload_path = data.get('email')
 
     if not email or not password or not birthdate_str:
         return jsonify({'error': 'Email, password, and birthdate are required.'}), 400
@@ -44,7 +45,8 @@ def register():
     new_user = User(
         email=email,
         password=password_hash,
-        birthdate=birthdate
+        birthdate=birthdate,
+        upload_path=upload_path
     )
 
     # Add the user to the database

@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -10,18 +11,23 @@ db = SQLAlchemy()
 # Initialize the login manager
 login_manager = LoginManager()
 
+# Location for files
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+
 def create_app():
     app = Flask(__name__)
 
     # Configure the app (consider moving sensitive keys to environment variables)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:vamos-a-china2025!@localhost:5432/postgres'
     app.config['SECRET_KEY'] = 'meditech-secret'  # Set a secure key for signing cookies and sessions
-
+    
     # Flask-Session Configuration
     app.config['SESSION_TYPE'] = 'filesystem'  # Or 'redis' for production
     app.config['SESSION_PERMANENT'] = False
     app.config['SESSION_USE_SIGNER'] = True  # Sign session cookies to prevent tampering
 
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    
     # Initialize Flask extensions
     db.init_app(app)
     migrate = Migrate(app, db)
