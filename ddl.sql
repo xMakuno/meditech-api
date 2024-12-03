@@ -27,9 +27,22 @@ CREATE TABLE public.users (
 	email varchar(255) NOT NULL,
 	"password" varchar NULL,
 	birthdate date DEFAULT now() NOT NULL,
+	upload_path varchar(100) NOT NULL,
 	CONSTRAINT users_pk PRIMARY KEY (id)
 );
 
+-- public.files definition
+-- Drop table
+-- DROP TABLE public.files;
+
+CREATE TABLE public.files (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    name varchar NOT NULL,
+    category varchar NULL,
+    user_id uuid NOT NULL,
+    CONSTRAINT files_pk PRIMARY KEY (id),
+    CONSTRAINT files_user_fk FOREIGN KEY (user_id) REFERENCES public.users (id) ON DELETE CASCADE
+);
 
 -- public.hospitals definition
 
