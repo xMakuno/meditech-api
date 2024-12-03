@@ -7,11 +7,12 @@ from datetime import datetime
 
 auth = Blueprint('auth', __name__, url_prefix='/auth')
 
+
 @auth.route('/register', methods=['POST'])
 def register():
     """
     Endpoint to register a new user.
-    Expects a JSON payload with:
+    Expects a JSON/Form payload with:
     - email: User's email (unique).
     - password: User's password (plaintext, will be hashed).
     - birthdate: Birthdate in YYYY-MM-DD format.
@@ -78,6 +79,8 @@ def login():
     else:
         email = request.form.get('email')
         password = request.form.get('password')
+
+    # TODO: redirect if email == "quemado"
 
     if not email or not password:
         return jsonify({'error': 'Email and password are required.'}), 400

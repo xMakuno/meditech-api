@@ -10,16 +10,58 @@ from datetime import datetime
 appointments = Blueprint('appointments', __name__ )
 
 
-@appointments.route('/', methods=['GET'])
-def get_all():
-    appointments_list = Appointment.query.all()
-    # If you want to return a proper JSON response with appointment details
+@appointments.route('/pending/<appointment_id>', methods=['PATCH'])
+def toggle_pending_appointment(appointment_id):
+    try:
+        appointment = Appointment.query.get(appointment_id)
+        if not appointment:
+            return jsonify({'error': 'Appointment not found!'}), 404
+
+        appointment.pending = not appointment.pending
+        db.session.commit()
+        return jsonify({
+            'message': 'Appointment status updated successfully',
+            'appointment': {
+                'id': str(appointment.id),
+                'date': appointment.date.isoformat(),
+                'reason': appointment.reason,
+                'user_id': str(appointment.user_id),
+                'doctor_id': appointment.doctor_id,
+                'pending': appointment.pending
+            }
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to update appointment', 'details': str(e)}), 500
+
+
+@appointments.route('/<doctor_id>', methods=['GET'])
+def get_appointments_by_doctor_id(doctor_id):
+    appointments_list = Appointment.query.get(doctor_id=doctor_id)
     return jsonify([{
         'id': str(appointment.id),
         'date': appointment.date.isoformat(),
-        'notes': appointment.notes,
-        'user_id': str(appointment.user_id)
-    } for appointment in appointments_list])
+        'reason': appointment.reason,
+        'user_id': str(appointment.user_id),
+        'doctor_id': appointment.doctor_id,
+        'pending': appointment.pending
+    } for appointment in appointments_list]), 200
+
+
+@appointments.route('/pending/<doctor_id>', methods=['GET'])
+def get_pending_appointments_by_doctor_id(doctor_id):
+    appointments_list = Appointment.query.filter(
+        Appointment.doctor_id == doctor_id,
+        Appointment.pending == True
+    ).all()
+    return jsonify([{
+        'id': str(appointment.id),
+        'date': appointment.date.isoformat(),
+        'reason': appointment.reason,
+        'user_id': str(appointment.user_id),
+        'doctor_id': appointment.doctor_id,
+        'pending': appointment.pending
+    } for appointment in appointments_list]), 200
 
 
 @appointments.route('/self')
@@ -30,20 +72,37 @@ def get_self_appointments():
     return jsonify([{
         'id': str(appointment.id),
         'date': appointment.date.isoformat(),
-        'notes': appointment.notes,
-        'user_id': str(appointment.user_id)
+        'reason': appointment.reason,
+        'user_id': str(appointment.user_id),
+        'doctor_id':  appointment.doctor_id,
+        'pending': appointment.pending
+    } for appointment in appointments_list]), 200
+
+
+@appointments.route('/', methods=['GET'])
+def get_all():
+    appointments_list = Appointment.query.all()
+    # If you want to return a proper JSON response with appointment details
+    return jsonify([{
+        'id': str(appointment.id),
+        'date': appointment.date.isoformat(),
+        'reason': appointment.reason,
+        'user_id': str(appointment.user_id),
+        'doctor_id': appointment.doctor_id,
+        'pending': appointment.pending
     } for appointment in appointments_list])
 
 
+# TODO: Edit Appointment back to how it was
 @appointments.route('/', methods=['POST'])
+@login_required
 def create_appointment():
     """
     Endpoint to create a new appointment.
     Supports both JSON and form-encoded payloads.
     Expects:
-    - date: The date of the appointment in 'YYYY-MM-DD' format.
-    - notes: Optional notes for the appointment.
-    - user_id: The user ID (foreign key to USERS table).
+    - reason: reason for the appointment
+    - doctor_id: patients desired doctor
     """
     print(f"Session: {session}")
     print(f"Current User: {current_user}")
@@ -57,18 +116,10 @@ def create_appointment():
     # TODO: Update info to match the Appointment model
     if request.content_type == 'application/json':
         data = request.json
-        notes = data.get('notes', '')  # Notes are optional
-        medication = data.get('medication', '')  # Medication is optional
-        heart_rate = data.get('heart_rate', '')  # Heart Rate is optional
-        blood_pressure = data.get('blood_pressure', '')  # Blood Pressure is optional
-        weight = data.get('weight', 0.00)  # Weight is optional
+        reason = data.get('reason')
         doctor_id = data.get('doctor_id')
     else:
-        notes = request.form.get('notes', '')
-        medication = request.form.get('medication', '')
-        heart_rate = request.form.get('heart_rate', '')
-        blood_pressure = request.form.get('blood_pressure', '')
-        weight = request.form.get('weight', 0.00)
+        reason = request.form.get('reason')
         doctor_id = request.form.get('doctor_id')
 
     # Retrieve the user from the database
@@ -79,18 +130,14 @@ def create_appointment():
     doctor = Doctor.query.get(doctor_id)
     if not doctor:
         return jsonify({'error': 'Doctor not found'}), 404
-
+    print(doctor)
     # TODO: Update the instantiation of new appointment
     # Create a new appointment instance
     new_appointment = Appointment(
-        doctor_id=doctor_id,
+        doctor_id=doctor.id,
         date=datetime.now().isoformat(),
         user_id=user.id,  # Link appointment to user
-        notes=notes,
-        medication=medication,
-        heart_rate=heart_rate,
-        blood_pressure=blood_pressure,
-        weight=weight
+        reason=reason
     )
 
     # Add and commit the new appointment to the database
@@ -103,11 +150,8 @@ def create_appointment():
                 'id': str(new_appointment.id),  # UUID is serialized as a string
                 'user_id': str(new_appointment.user_id),
                 'doctor_id': str(new_appointment.doctor_id),
-                'notes': new_appointment.notes,
-                'medication': new_appointment.medication,
-                'heart_rate': new_appointment.heart_rate,
-                'blood_pressure': new_appointment.blood_pressure,
-                'weight': new_appointment.weight
+                'reason': new_appointment.reason,
+                'date': new_appointment.date.isoformat(),
             }
         }), 201
     except Exception as e:

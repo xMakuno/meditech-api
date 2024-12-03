@@ -13,8 +13,10 @@ class User(db.Model, UserMixin):
     password = db.Column(db.Text, nullable=False)
     birthdate = db.Column(db.Date, nullable=False)
 
-    # Relationship to Appointment
+    # Relationships
     appointments = db.relationship('Appointment', back_populates='user', cascade='all, delete-orphan')
+    subscriptions = db.relationship('Subscription', back_populates='user', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"<User {self.name}>"
+

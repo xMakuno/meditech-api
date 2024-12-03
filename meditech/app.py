@@ -32,10 +32,18 @@ def create_app():
     from .appointments.routes import appointments
     from .auth.routes import auth
     from .doctors.routes import doctors
+    from .hospitals.routes import hospitals
+    from .insurances.routes import insurances
+    from .subscriptions.routes import subscriptions
+    from .medications.routes import medications
 
     app.register_blueprint(appointments, url_prefix='/appointments')
     app.register_blueprint(auth, url_prefix='/auth')
     app.register_blueprint(doctors, url_prefix='/doctors')
+    app.register_blueprint(hospitals, url_prefix='/hospitals')
+    app.register_blueprint(insurances, url_prefix='/insurances')
+    app.register_blueprint(subscriptions, url_prefix='/subscriptions')
+    app.register_blueprint(medications, url_prefix='/medications')
 
     # Setup login manager (user loader function)
     @login_manager.user_loader
