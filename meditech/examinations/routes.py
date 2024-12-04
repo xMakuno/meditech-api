@@ -1,5 +1,5 @@
 from flask import request, redirect, url_for, Blueprint, jsonify, session
-from flask_login import login_required, current_user
+from flask_login import current_user
 from meditech.app import db
 from datetime import datetime
 
@@ -8,12 +8,13 @@ from ..appointments.models import Appointment
 from ..doctors.models import Doctor
 from ..hospitals.models import Hospital
 from ..users.models import User
+from ..token_req import token_required
 
 examinations = Blueprint('examinations', __name__, url_prefix='/examinations')
 
 @examinations.route('/self', methods=['GET'])
-@login_required
-def get_all_self_examinations():
+@token_required
+def get_all_self_examinations(current_user):
     user_id = current_user.id
     examinations_list = Examination.query.filter(
         Examination.user_id == user_id,
@@ -28,8 +29,8 @@ def get_all_self_examinations():
 
 
 @examinations.route('/', methods=['POST'])
-@login_required
-def create_examination():
+@token_required
+def create_examination(current_user):
 
     """
     Endpoint to create an Examination

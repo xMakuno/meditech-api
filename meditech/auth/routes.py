@@ -3,10 +3,12 @@ from flask_login import login_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from meditech.users.models import User
 from meditech.app import db
-from datetime import datetime
+from datetime import datetime, timedelta
+import jwt
 
 auth = Blueprint('auth', __name__, url_prefix='/auth')
 
+SECRET_KEY = 'roadtochina2025'
 
 @auth.route('/register', methods=['POST'])
 def register():
@@ -98,11 +100,18 @@ def login():
 
     # Store user session details
     login_user(user)
-
+    token = jwt.encode(
+        {
+            'user_id': str(user.id),
+            'exp': datetime.utcnow() + timedelta(hours=1)  # Token expires in 1 hour
+        },
+        SECRET_KEY,
+        algorithm='HS256'
+    )
     return jsonify({
         'message': 'Login successful',
         'user': {
-            'id': str(user.id),
+            'token':token,
             'email': user.email
         }
     }), 200

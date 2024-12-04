@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_session import Session  # Flask-Session for session management
 from flask_login import LoginManager  # Flask-Login for user authentication
-
+from flask_cors import CORS
 # Initialize the database instance
 db = SQLAlchemy()
 
@@ -16,7 +16,8 @@ UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
 
 def create_app():
     app = Flask(__name__)
-
+    # Enable CORS for all routes and origins
+    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
     # Configure the app (consider moving sensitive keys to environment variables)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:vamos-a-china2025!@localhost:5432/postgres'
     app.config['SECRET_KEY'] = 'meditech-secret'  # Set a secure key for signing cookies and sessions

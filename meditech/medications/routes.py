@@ -1,9 +1,9 @@
 from flask import request, redirect, url_for, Blueprint, jsonify, session
-from flask_login import login_required, current_user
+from flask_login import current_user
 from .models import Medication
 from meditech.app import db
 from datetime import datetime
-
+from ..token_req import token_required
 from ..appointments.models import Appointment
 from ..doctors.models import Doctor
 from ..users.models import User
@@ -12,8 +12,8 @@ medications = Blueprint('medications', __name__, url_prefix='/medications')
 
 
 @medications.route('/self', methods=['GET'])
-@login_required
-def get_self_active_medications():
+@token_required
+def get_self_active_medications(current_user):
     user_id = current_user.id
     medications_list = Medication.query.filter(
         Medication.user_id == user_id,
@@ -68,7 +68,7 @@ def get_all_medications():
 
 
 @medications.route('/<appointment_id>', methods=['POST'])
-@login_required
+@token_required
 def create_medication(appointment_id):
     user_id = current_user.id
     if request.content_type == 'application/json':
