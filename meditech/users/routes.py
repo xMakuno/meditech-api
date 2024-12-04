@@ -17,7 +17,7 @@ def getFilePath(user, category=""):
 @users.route('/uploads/<name>')
 @token_required
 def download_file(current_user, name):
-    return send_from_directory(getFilePath(current_user.email), secure_filename(name))
+    return send_from_directory(getFilePath(current_user.email), name)
 
 @users.route('/doctor/files')
 @token_required
@@ -34,7 +34,7 @@ def get_shared_files(current_user):
     if not user:
         return jsonify({'error': 'User not found'}), 404
     files = File.query.join(FileShare, FileShare.file_id == File.id).filter(FileShare.shared_with_id == current_user.id, File.category == category, FileShare.shared_by_id == user.id).all()
-    file_list = [{'name': file.name} for file in files]
+    file_list = [{'name': file.name, 'date': file.created_at} for file in files]
     return jsonify({'files': file_list}), 200
 
 
@@ -74,7 +74,7 @@ def get_files_by_user(current_user):
     files = File.query.filter_by(user_id=user.id).all()
 
     # Extract file names
-    file_list = [{'name': file.name} for file in files]
+    file_list = [{'name': file.name, 'date': file.created_at} for file in files]
 
     return jsonify({'files': file_list}), 200
 
@@ -96,7 +96,7 @@ def get_files_by_user_and_category(current_user):
     files = File.query.filter_by(user_id=user.id, category=category).all()
 
     # Extract file names
-    file_list = [{'name': file.name} for file in files]
+    file_list = [{'name': file.name, 'date': file.created_at} for file in files]
 
     return jsonify({'files': file_list}), 200
 
@@ -133,7 +133,7 @@ def upload_file(current_user):
             os.makedirs(path)
         
         # Save the file with the random name
-        full_path = os.path.join(path, secure_filename(file.filename))
+        full_path = os.path.join(path, file.filename)
         file.save(full_path)
 
         # Optionally, save file details in the database
