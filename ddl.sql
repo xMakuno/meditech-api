@@ -21,29 +21,47 @@ CREATE TABLE public.doctors (
 
 -- DROP TABLE public.users;
 
+-- Ensure the `pgcrypto` extension is enabled for `gen_random_uuid()`
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- public.users definition
 CREATE TABLE public.users (
-	id uuid NOT NULL,
-	"name" varchar(100) NULL,
-	email varchar(255) NOT NULL,
-	"password" varchar NULL,
-	birthdate date DEFAULT now() NOT NULL,
-	upload_path varchar(100) NOT NULL,
-	CONSTRAINT users_pk PRIMARY KEY (id)
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    "name" varchar(100) NULL,
+    email varchar(255) NOT NULL,
+    "password" varchar NULL,
+    birthdate date DEFAULT now() NOT NULL,
+    upload_path varchar(100) NOT NULL,
+    CONSTRAINT users_pk PRIMARY KEY (id)
 );
 
 -- public.files definition
--- Drop table
--- DROP TABLE public.files;
-
 CREATE TABLE public.files (
     id uuid NOT NULL DEFAULT gen_random_uuid(),
     name varchar NOT NULL,
     category varchar NULL,
     user_id uuid NOT NULL,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT files_pk PRIMARY KEY (id),
     CONSTRAINT files_user_fk FOREIGN KEY (user_id) REFERENCES public.users (id) ON DELETE CASCADE
 );
 
+-- public.file_shares definition (for file sharing)
+CREATE TABLE public.file_shares (
+    id uuid NOT NULL DEFAULT gen_random_uuid(),
+    file_id uuid NOT NULL,
+    shared_by_id uuid NOT NULL,
+    shared_with_id uuid NOT NULL,
+    shared_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT file_shares_pk PRIMARY KEY (id),
+    CONSTRAINT file_shares_file_fk FOREIGN KEY (file_id) REFERENCES public.files (id) ON DELETE CASCADE,
+    CONSTRAINT file_shares_shared_by_fk FOREIGN KEY (shared_by_id) REFERENCES public.users (id) ON DELETE CASCADE,
+    CONSTRAINT file_shares_shared_with_fk FOREIGN KEY (shared_with_id) REFERENCES public.users (id) ON DELETE CASCADE
+);
+
+-- Indexes for faster lookups on file shares
+CREATE INDEX idx_file_shares_shared_by ON public.file_shares(shared_by_id);
+CREATE INDEX idx_file_shares_shared_with ON public.file_shares(shared_with_id);
 -- public.hospitals definition
 
 -- Drop table

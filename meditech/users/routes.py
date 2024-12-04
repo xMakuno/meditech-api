@@ -2,7 +2,7 @@ import os
 from flask import Flask, flash, request, redirect, url_for, Blueprint, jsonify, session
 from werkzeug.utils import secure_filename
 from flask import send_from_directory
-from .models import User, File
+from .models import User, File, FileShare
 from meditech.app import db
 from ..token_req import token_required
 import uuid
@@ -18,6 +18,47 @@ def getFilePath(user, category=""):
 @token_required
 def download_file(current_user, name):
     return send_from_directory(getFilePath(current_user.email), secure_filename(name))
+
+@users.route('/doctor/files')
+@token_required
+def get_shared_files(current_user):
+    if 'category' not in request.args:
+        return jsonify({'error': 'No category provided'}), 400
+    if 'patient' not in request.args:
+        return jsonify({'error': 'No patient provided'}), 400
+
+    category = request.args.get('category')
+    patient = request.args.get('patient')
+
+    user = User.query.filter_by(email=patient).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    files = File.query.join(FileShare, FileShare.file_id == File.id).filter(FileShare.shared_with_id == current_user.id, File.category == category, FileShare.shared_by_id == user.id).all()
+    file_list = [{'name': file.name} for file in files]
+    return jsonify({'files': file_list}), 200
+
+
+@users.route('/share', methods=['POST'])
+@token_required
+def share_files(current_user):
+    doctor_email = request.json.get('doctor_email')
+    # share all files with doctor_email to share it should use the FileShare model
+    if not doctor_email:
+        return jsonify({'error': 'Doctor email is required'}), 400
+    user = User.query.filter_by(email=doctor_email).first()
+    if not user:
+        return jsonify({'error': 'Doctor not found'}), 404
+    files = File.query.filter_by(user_id=current_user.id).all()
+    for file in files:
+        new_share = FileShare(
+            file_id=file.id,
+            shared_by_id=current_user.id,
+            shared_with_id=user.id
+        )
+        db.session.add(new_share)
+    db.session.commit()
+        
+    return jsonify({'message': 'Files shared successfully'}), 200
 
 @users.route('/userfiles', methods=['GET'])
 @token_required
@@ -107,6 +148,21 @@ def upload_file(current_user):
         return jsonify({
             'message': 'File uploaded successfully'
         }), 201
+
+@users.route('/')
+def get_all_users():
+    users = User.query.all()
+    output = []
+    for user in users:
+        if ("doctor" not in user.email):
+            user_data = {
+                'id': str(user.id),
+                'email': user.email,
+            }
+            output.append(user_data)
+    return jsonify({'patients': output}), 200
+
+
 
 def allowed_file(filename):
     return '.' in filename and \

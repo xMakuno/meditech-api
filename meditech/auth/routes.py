@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, session
 from flask_login import login_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from meditech.users.models import User
+from meditech.doctors.models import Doctor
 from meditech.app import db
 from datetime import datetime, timedelta
 import jwt
@@ -50,6 +51,17 @@ def register():
         birthdate=birthdate,
         upload_path=upload_path
     )
+
+    if "doctor" in email:
+        new_doctor = Doctor(
+            email=email,
+            name=email.split('@')[0],
+            hospital="Hospital",
+            phone="1234567890",
+            specialty="General"
+        )
+        db.session.add(new_doctor)
+        db.session.commit()
 
     # Add the user to the database
     try:
